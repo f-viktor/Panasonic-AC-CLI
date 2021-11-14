@@ -1,0 +1,10 @@
+{
+ "Username": "useremail@panasonic.com",
+ "Password": "P4ssw0rd!",
+ "Bearer": "",
+ "DeviceGuid": "",
+ "RetryAttempts": 3,
+ "Verbose": false,
+ "HttpDebug": false,
+ "HttpProxy": ""
+}
