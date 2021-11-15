@@ -10,13 +10,14 @@ You do have to install the [Panasonic app](https://play.google.com/store/apps/de
 Once you have done that, you can set up `config.json`:
 ```
 {
- "Username": "yourRegisteredEmail@thePanasonicSite.com", // Your registered user ID
- "Password": "YourPanasonicPassword",                    // Password for the registered email
- "Bearer": "",                                           // Leave empty, it will be filled by the script
- "DeviceGuid": "",                                       // You can fill this later, from the ouput of -list
- "RetryAttempts": 2,                                     // If a HTTP request fails, how many times to retry
- "HttpDebug": false,                                     // Print HTTP requests and responses
- "HttpProxy": ""                                         // HTTP proxy for debugging
+ "Username": "email@panasonicid.com", // Your registered user ID
+ "Password": "YourPanasonicPassword", // Password for the registered email
+ "Bearer": "",                        // Leave empty, it will be filled by the script
+ "DeviceGuid": "",                    // You can fill this later, from the ouput of -list
+ "RetryAttempts": 2,                  // If a HTTP request fails, how many times to retry
+ "HttpDebug": false,                  // Print HTTP requests and responses
+ "HttpProxy": "" ,                    // HTTP proxy for debugging
+ "Verbose": false                     // Does nothing, use -q switch instead
 }
 ```
 After this you can delete the app from your phone, the script will log you out anyway.
@@ -29,9 +30,11 @@ cd Panasonic-AC-CLI
 go build .
 ```
 
+Otherwise, just get the binary from the releases page.
+
 ## Usage
 
-List all associated devices with your account
+List all devices associated with your account
 ```
 ./pamac -list
 ```
@@ -43,7 +46,7 @@ Read current settings of a device
 ```
 ./pamac -status
 ```
-Set new status for device you can set any combination of settings to be updated
+Set new status for device, you can set any combination of settings to be updated
 ```
 ./pamac -power on -m cool -t 22 -fan auto
 ```
