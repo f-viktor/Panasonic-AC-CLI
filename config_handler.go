@@ -21,7 +21,7 @@ type ConfigFile struct {
 
 var GlobalConfig ConfigFile
 
-func ReadConfig(path string) {
+func readConfig(path string) {
 	//open config file
 	file, _ := os.Open(path)
 	defer file.Close()
@@ -37,7 +37,7 @@ func ReadConfig(path string) {
 }
 
 // unused was only in use when we I tried to use autologin cookies
-func OverwriteConfigFile(conf ConfigFile) {
+func overwriteConfigFile(conf ConfigFile) {
 
 	file, _ := json.MarshalIndent(conf, "", " ")
 

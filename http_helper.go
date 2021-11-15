@@ -12,22 +12,43 @@ import (
 	"strings"
 )
 
-func addJsonElement(name string, value string) string {
-	return `"` + name + `":"` + value + `"`
+func GetDeviceList() DeviceGroupList {
+	verbosePrint("[+] Getting device list for " + GlobalConfig.Username)
+	respBody := performHTTPRequest("GET", "/device/group", nil, GlobalConfig.RetryAttempts)
+
+	var deviceStatus DeviceGroupList
+	err := json.Unmarshal(respBody, &deviceStatus)
+	if err != nil {
+		verbosePrint("[!] Device list could not be read" + string(err.Error()))
+	}
+	verbosePrint("[+] Device list found for " + GlobalConfig.Username)
+	return deviceStatus
 }
 
 func SetDeviceStatus(parameters string) {
 	getDeviceId()
+	verbosePrint("[+] Setting device status for " + GlobalConfig.DeviceGuid)
+
 	controlJson := `{"deviceGuid":"` + GlobalConfig.DeviceGuid + `","parameters":{`
 	controlJson += parameters
 	controlJson += `}}`
 
-	_ = performHTTPRequest("POST", "/deviceStatus/control", []byte(controlJson), GlobalConfig.RetryAttempts)
+	respBody := performHTTPRequest("POST", "/deviceStatus/control", []byte(controlJson), GlobalConfig.RetryAttempts)
 
+	var result map[string]interface{}
+	json.Unmarshal([]byte(respBody), &result)
+	if result["result"] != nil && result["result"].(float64) == 0 {
+		verbosePrint("[+] Device status set for " + GlobalConfig.DeviceGuid)
+	} else if result["message"] != nil {
+		verbosePrint("[!] Error getting setting device status: " + result["message"].(string))
+	} else {
+		verbosePrint("[!] Setting device status update may have failed or was only partial " + GlobalConfig.DeviceGuid)
+	}
 }
 
 func GetDeviceStatus() DeviceStatusFull {
 	getDeviceId()
+	verbosePrint("[+] Getting device status for " + GlobalConfig.DeviceGuid)
 	deviceId := strings.Replace(GlobalConfig.DeviceGuid, "+", "%2B", -1)
 	respBody := performHTTPRequest("GET", "/deviceStatus/now/"+deviceId, nil, GlobalConfig.RetryAttempts)
 
@@ -36,7 +57,8 @@ func GetDeviceStatus() DeviceStatusFull {
 	if err != nil {
 		verbosePrint("[!] Device status could not be read" + string(err.Error()))
 	}
-
+	verbosePrint("[+] Device status found for " + GlobalConfig.DeviceGuid)
+	//visualize device status
 	return deviceStatus
 }
 
@@ -44,6 +66,7 @@ func getDeviceId() {
 	if !(GlobalConfig.DeviceGuid == "") {
 		return
 	}
+	verbosePrint("[+] DeviceID not found querying first device in list")
 
 	respBody := performHTTPRequest("GET", "/device/group", nil, GlobalConfig.RetryAttempts)
 
@@ -57,18 +80,19 @@ func getDeviceId() {
 		result["groupList"].([]interface{})[0].(map[string]interface{})["deviceList"].([]interface{})[0].(map[string]interface{})["deviceGuid"] != nil {
 
 		deviceGuid := result["groupList"].([]interface{})[0].(map[string]interface{})["deviceList"].([]interface{})[0].(map[string]interface{})["deviceGuid"].(string)
-		verbosePrint("[!] Device ID " + deviceGuid)
+		verbosePrint("[+] Device ID " + deviceGuid + " chosen")
 		GlobalConfig.DeviceGuid = deviceGuid
-		OverwriteConfigFile(GlobalConfig)
+		overwriteConfigFile(GlobalConfig)
 	} else if result["message"] != nil {
-		verbosePrint("[!] Error: " + result["message"].(string))
+		verbosePrint("[!] Error getting DeviceID: " + result["message"].(string))
 
 	} else {
-		verbosePrint("[!] Getting Device ID failed, reason unknown")
+		verbosePrint("[!] Getting DeviceID failed, reason unknown")
 	}
 }
 
 func refreshLoginAuthToken() {
+	verbosePrint("[+] Token Expired or invalid, trying Login as " + GlobalConfig.Username)
 	postBody := []byte(`{"language":"0","loginId":"` + GlobalConfig.Username + `","password":"` + GlobalConfig.Password + `"}`)
 	//login attempts will be repeated in the main request, should not be retried here, it would cause infinite recursion
 	respBody := performHTTPRequest("POST", "/auth/login", postBody, -1)
@@ -77,9 +101,9 @@ func refreshLoginAuthToken() {
 	json.Unmarshal([]byte(respBody), &result)
 
 	if result["uToken"] != nil {
-		verbosePrint("[!] Login successful ")
+		verbosePrint("[+] Login successful")
 		GlobalConfig.Bearer = result["uToken"].(string)
-		OverwriteConfigFile(GlobalConfig)
+		overwriteConfigFile(GlobalConfig)
 		return
 	} else if result["message"] != nil {
 		verbosePrint("[!] Login failed")
@@ -146,12 +170,13 @@ func performHTTPRequest(method string, reqURL string, body []byte, retryCount in
 			verbosePrint("[!] HTTP request returned with " + strconv.Itoa(resp.StatusCode) + " : " + method + " " + reqURL)
 
 			// if token was expired, get a new token and retry request (if not already a login request)
-			if resp.StatusCode >= 400 && resp.StatusCode < 500 && retryCount != -1 {
+			if resp.StatusCode == 401 && retryCount != -1 {
 				refreshLoginAuthToken()
 			}
 
 			// 500 error code would mean the request was wrong, but did not time out
 			if resp.StatusCode != 500 {
+				verbosePrint("[!] Retrying previous HTTP request")
 				continue
 			}
 		}

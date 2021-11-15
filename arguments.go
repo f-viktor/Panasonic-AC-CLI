@@ -8,13 +8,22 @@ import (
 	"strings"
 )
 
+type Arguments struct {
+	Params   DeviceParamList
+	Command  string
+	DeviceId string
+}
+
 // parse command line arguments
-func ParseArgs() DeviceParamList {
+func parseArgs() Arguments {
 
 	config := flag.String("config", "config.json", "Path to config file")
-	verbose := flag.Bool("v", false, "Verbose")
+	quiet := flag.Bool("q", false, "Don't print status update messages")
 	help := flag.Bool("h", false, "Display this help text")
 	helpDetails := flag.Bool("help", false, "Display detailed information")
+	listDevices := flag.Bool("list", false, "List devices associated with user")
+	deviceId := flag.String("dev", "", "DeviceGUID use -list to print avaliable")
+	statDevice := flag.Bool("status", false, "Display current status of device")
 
 	power := flag.String("power", "", "Power > On/Off ")
 	mode := flag.String("m", "", "AC mode > auto/heat/cool/dry/nanoe")
@@ -26,8 +35,11 @@ func ParseArgs() DeviceParamList {
 	temperatureSet := flag.String("t", "", "TemperatureSet in Celsius, supports 1 decimal > 22.5 ")
 
 	flag.Parse()
-	ReadConfig(*config)
-	GlobalConfig.Verbose = *verbose
+	readConfig(*config)
+	GlobalConfig.Verbose = !*quiet
+	if *deviceId != "" {
+		GlobalConfig.DeviceGuid = *deviceId
+	}
 
 	if *help {
 		flag.Usage()
@@ -38,10 +50,18 @@ func ParseArgs() DeviceParamList {
 		printHelpDetails()
 		os.Exit(2)
 	}
+	args := Arguments{}
+	args.Command = "set"
+	args.Params = setDeviceFlags(strings.ToLower(*power), strings.ToLower(*mode), strings.ToLower(*eco), strings.ToLower(*fanSpeed), strings.ToLower(*angleVertical), strings.ToLower(*angleHorizontal), strings.ToLower(*nanoe), strings.ToLower(*temperatureSet))
 
-	params := setDeviceFlags(strings.ToLower(*power), strings.ToLower(*mode), strings.ToLower(*eco), strings.ToLower(*fanSpeed), strings.ToLower(*angleVertical), strings.ToLower(*angleHorizontal), strings.ToLower(*nanoe), strings.ToLower(*temperatureSet))
+	if *listDevices {
+		args.Command = "list"
+	}
+	if *statDevice {
+		args.Command = "status"
+	}
 
-	return params
+	return args
 }
 
 func setDeviceFlags(power string, mode string, eco string, fanSpeed string, angleVertical string, angleHorizontal string, nanoe string, temperatureSet string) DeviceParamList {

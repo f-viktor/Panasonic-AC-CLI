@@ -6,60 +6,73 @@ import (
 )
 
 func main() {
-	args := ParseArgs()
+	args := parseArgs()
 
-	var params string
+	switch args.Command {
+	case "set":
+		setParamsOnDevice(args.Params, args.DeviceId)
+
+	case "list":
+		GetDeviceList().Print()
+
+	case "status":
+		GetDeviceStatus().Print()
+	}
+}
+
+func setParamsOnDevice(argParams DeviceParamList, deviceId string) {
+	var sendParams string
 
 	// This clownery is necessary, because golang can't remove elements from an unmarshal
 	// We only want to set the specific arguments we are changing
-	if args.EcoFunctionData != -999 {
-		params += `"ecoFunctionData":` + strconv.Itoa(args.EcoFunctionData) + `,`
+	if argParams.EcoFunctionData != -999 {
+		sendParams += `"ecoFunctionData":` + strconv.Itoa(argParams.EcoFunctionData) + `,`
 	}
-	if args.AirSwingLR != -999 {
-		params += `"airSwingLR":` + strconv.Itoa(args.AirSwingLR) + `,`
+	if argParams.AirSwingLR != -999 {
+		sendParams += `"airSwingLR":` + strconv.Itoa(argParams.AirSwingLR) + `,`
 	}
-	if args.Nanoe != -999 {
-		params += `"nanoe":` + strconv.Itoa(args.Nanoe) + `,`
+	if argParams.Nanoe != -999 {
+		sendParams += `"nanoe":` + strconv.Itoa(argParams.Nanoe) + `,`
 	}
-	if args.EcoNavi != -999 {
-		params += `"ecoNavi":` + strconv.Itoa(args.EcoNavi) + `,`
+	if argParams.EcoNavi != -999 {
+		sendParams += `"ecoNavi":` + strconv.Itoa(argParams.EcoNavi) + `,`
 	}
-	if args.EcoMode != -999 {
-		params += `"ecoMode":` + strconv.Itoa(args.EcoMode) + `,`
+	if argParams.EcoMode != -999 {
+		sendParams += `"ecoMode":` + strconv.Itoa(argParams.EcoMode) + `,`
 	}
-	if args.OperationMode != -999 {
-		params += `"operationMode":` + strconv.Itoa(args.OperationMode) + `,`
+	if argParams.OperationMode != -999 {
+		sendParams += `"operationMode":` + strconv.Itoa(argParams.OperationMode) + `,`
 	}
-	if args.FanAutoMode != -999 {
-		params += `"fanAutoMode":` + strconv.Itoa(args.FanAutoMode) + `,`
+	if argParams.FanAutoMode != -999 {
+		sendParams += `"fanAutoMode":` + strconv.Itoa(argParams.FanAutoMode) + `,`
 	}
-	if args.TemperatureSet != -999 {
-		params += `"temperatureSet":` + strconv.FormatFloat(args.TemperatureSet, 'f', 1, 64) + `,`
+	if argParams.TemperatureSet != -999 {
+		sendParams += `"temperatureSet":` + strconv.FormatFloat(argParams.TemperatureSet, 'f', 1, 64) + `,`
 	}
-	if args.FanSpeed != -999 {
-		params += `"fanSpeed":` + strconv.Itoa(args.FanSpeed) + `,`
+	if argParams.FanSpeed != -999 {
+		sendParams += `"fanSpeed":` + strconv.Itoa(argParams.FanSpeed) + `,`
 	}
-	if args.IAuto != -999 {
-		params += `"iAuto":` + strconv.Itoa(args.IAuto) + `,`
+	if argParams.IAuto != -999 {
+		sendParams += `"iAuto":` + strconv.Itoa(argParams.IAuto) + `,`
 	}
-	if args.AirQuality != -999 {
-		params += `"airQuality":` + strconv.Itoa(args.AirQuality) + `,`
+	if argParams.AirQuality != -999 {
+		sendParams += `"airQuality":` + strconv.Itoa(argParams.AirQuality) + `,`
 	}
-	if args.Operate != -999 {
-		params += `"operate":` + strconv.Itoa(args.Operate) + `,`
+	if argParams.Operate != -999 {
+		sendParams += `"operate":` + strconv.Itoa(argParams.Operate) + `,`
 	}
-	if args.AirDirection != -999 {
-		params += `"airDirection":` + strconv.Itoa(args.AirDirection) + `,`
+	if argParams.AirDirection != -999 {
+		sendParams += `"airDirection":` + strconv.Itoa(argParams.AirDirection) + `,`
 	}
-	if args.ActualNanoe != -999 {
-		params += `"actualNanoe":` + strconv.Itoa(args.ActualNanoe) + `,`
+	if argParams.ActualNanoe != -999 {
+		sendParams += `"actualNanoe":` + strconv.Itoa(argParams.ActualNanoe) + `,`
 	}
-	if args.AirSwingUD != -999 {
-		params += `"airSwingUD":` + strconv.Itoa(args.AirSwingUD) + `,`
+	if argParams.AirSwingUD != -999 {
+		sendParams += `"airSwingUD":` + strconv.Itoa(argParams.AirSwingUD) + `,`
 	}
 
 	// remove last comma
-	params = strings.TrimRight(params, ",")
+	sendParams = strings.TrimRight(sendParams, ",")
 
-	SetDeviceStatus(params)
+	SetDeviceStatus(sendParams)
 }
