@@ -3,8 +3,7 @@
  "Password": "P4ssw0rd!",
  "Bearer": "",
  "DeviceGuid": "",
- "RetryAttempts": 3,
- "Verbose": false,
+ "RetryAttempts": 2,
  "HttpDebug": false,
  "HttpProxy": ""
 }
