@@ -136,11 +136,18 @@ func (dsf DeviceStatusFull) Print() {
 		power = "On"
 	}
 
-	var nanoe string
-	if dsf.Parameters.Nanoe == 1 {
-		nanoe = "Off"
-	} else {
-		nanoe = "On"
+	var mode string
+	switch dsf.Parameters.OperationMode {
+	case 0:
+		mode = "Auto"
+	case 1:
+		mode = "Dry"
+	case 2:
+		mode = "Cool"
+	case 3:
+		mode = "Heat"
+	case 4:
+		mode = "Nanoe"
 	}
 
 	var eco string
@@ -209,7 +216,7 @@ func (dsf DeviceStatusFull) Print() {
 	w := tabwriter.NewWriter(os.Stdout, 1, 1, 1, ' ', 0)
 
 	//Graphs with bars or something
-	fmt.Fprintln(w, "|\tPower: "+power+" \t|\t Nanoe: "+nanoe+" \t|\t Eco mode: "+eco+"\t|")
+	fmt.Fprintln(w, "|\tPower: "+power+" \t|\t Mode: "+mode+" \t|\t Eco mode: "+eco+"\t|")
 
 	fmt.Fprintln(w, "|\tFan Speed: "+fanSpeed+" \t|\t Vertical Angle: "+airSwingUD+" \t|\t Horizontal Angle: "+airSwingLR+"\t|")
 

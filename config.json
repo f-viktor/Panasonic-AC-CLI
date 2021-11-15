@@ -1,9 +1,10 @@
 {
- "Username": "useremail@panasonic.com",
- "Password": "P4ssw0rd!",
- "Bearer": "",
- "DeviceGuid": "",
+ "Username": "realistic.terrydavis@protonmail.com",
+ "Password": "9%vLA%zZM43Ef7d7",
+ "Bearer": "CL2PfhWE0mGwPyorCxubqKI7S48uliRS",
+ "DeviceGuid": "CS-Z25VKEW+4962315197",
  "RetryAttempts": 2,
+ "Verbose": true,
  "HttpDebug": false,
- "HttpProxy": ""
+ "HttpProxy": "http://127.0.0.1:8080"
 }

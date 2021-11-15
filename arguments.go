@@ -40,6 +40,7 @@ func parseArgs() Arguments {
 	if *deviceId != "" {
 		GlobalConfig.DeviceGuid = *deviceId
 	}
+	overwriteConfigFile(GlobalConfig)
 
 	if *help {
 		flag.Usage()
