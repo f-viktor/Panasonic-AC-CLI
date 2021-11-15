@@ -8,7 +8,6 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
-	"os"
 	"strconv"
 	"strings"
 )
@@ -130,7 +129,7 @@ func performHTTPRequest(method string, reqURL string, body []byte, retryCount in
 
 		resp, err := client.Do(req)
 		if err != nil {
-			verbosePrint("[!] HTTP request failed to " + method + " " + reqURL + " Attempt: " + strconv.Itoa(i)) // attempt no+1
+			verbosePrint("[!] HTTP request failed to " + method + " " + reqURL + " Attempt: " + strconv.Itoa(i))
 			verbosePrint(err.Error())
 			continue
 		}
@@ -139,15 +138,15 @@ func performHTTPRequest(method string, reqURL string, body []byte, retryCount in
 		respBody, err := ioutil.ReadAll(resp.Body)
 
 		if GlobalConfig.HttpDebug {
-			fmt.Printf("%s %s \nRequest: %s \nResponse: %s \n", method, reqURL, string(body), string(respBody))
+			fmt.Printf("%s %s Attempt: %s\nRequest: %s \nResponse: %s \n", method, reqURL, strconv.Itoa(i), string(body), string(respBody))
 		}
 
 		if resp.StatusCode != 200 {
 			//returned with <status code>
 			verbosePrint("[!] HTTP request returned with " + strconv.Itoa(resp.StatusCode) + " : " + method + " " + reqURL)
 
-			// if token was expired, get a new token and retry request
-			if resp.StatusCode >= 400 && resp.StatusCode < 500 {
+			// if token was expired, get a new token and retry request (if not already a login request)
+			if resp.StatusCode >= 400 && resp.StatusCode < 500 && retryCount != -1 {
 				refreshLoginAuthToken()
 			}
 
@@ -159,6 +158,5 @@ func performHTTPRequest(method string, reqURL string, body []byte, retryCount in
 
 		return []byte(respBody)
 	}
-	os.Exit(-1)
 	return nil
 }
