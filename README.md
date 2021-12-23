@@ -36,19 +36,19 @@ Otherwise, just get the binary from the releases page.
 
 List all devices associated with your account
 ```
-./pamac -list
+./panac -list
 ```
 Select a device
 ```
-./pamac -dev <DeviceGUID>
+./panac -dev <DeviceGUID>
 ```
 Read current settings of a device
 ```
-./pamac -status
+./panac -status
 ```
 Set new status for device, you can set any combination of settings to be updated
 ```
-./pamac -power on -m cool -t 22 -fan auto
+./panac -power on -m cool -t 22 -fan auto
 ```
 The rest of the options are
 ```
