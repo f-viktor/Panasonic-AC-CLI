@@ -30,7 +30,6 @@ cd Panasonic-AC-CLI
 go build .
 ```
 
-Otherwise, just get the binary from the releases page.
 
 ## Usage
 
